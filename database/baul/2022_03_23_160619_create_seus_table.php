@@ -17,6 +17,14 @@ return new class extends Migration
             $table->idSeu();
             $table->timestamps();
             $table->string('nomSeu',30)->unique();
+
+            $table->string('correuSeu',35)->unique();
+            $table->text('notesSeu')->nullable();
+            $table->string('logoSeu',30)->nullable();
+
+
+
+
             $table->string('correuSeu',35)->unique();
             $table->text('notesSeu')->nullable();
             $table->string('logoSeu',30)->nullable();
