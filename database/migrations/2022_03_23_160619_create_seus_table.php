@@ -14,13 +14,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('seus', function (Blueprint $table) {
-            $table->idSeu();
+            $table->id();
             $table->timestamps();
             $table->string('nomSeu',30)->unique();
             $table->string('correuSeu',35)->unique();
             $table->text('notesSeu')->nullable();
             $table->string('logoSeu',30)->nullable();
-            $table->timestamp('baixaSeu')->nullable();
+            $table->softDeletes();
         });
     }
 

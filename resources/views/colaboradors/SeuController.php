@@ -37,15 +37,13 @@ class SeuController extends Controller
     public function store(Request $request)
     {
         $condicions=['form_nomSeu'=>'required|max:30|unique:seus,nomSeu',
-                     'form_ubicacioSeu'=>'max:50',
                      'form_correuSeu'=>'max:35|unique:seus,correuSeu',
                      'form_logoSeu'=>'max:30'
                     ];
         $request->validate($condicions);
         Seu::create(['nomSeu'=>$request['form_nomSeu'],
-                     'ubicacioSeu'=>request['form_ubicacioSeu'],
                      'correuSeu'=>$request['form_correuSeu'],
-                     'notesSeu'=>request['form_notesSeu'],
+                     'notesSeu'=>$request['form_notesSeu'],
                      'logoSeu'=>$request['form_logoSeu'],
                      'baixaSeu'=>null
         ]);

@@ -16,6 +16,9 @@
     <ul>
         <li><a href="llistaOrgAcred">LLista d'Organismes Acreditadors</a></li>
         <li><a href="llistaAcredit">LLista d'Acreditacions</a></li>
+        <li><a href="llistaSeu">LLista de Seus</a></li>
+        <li><a href="llistaColab">LLista de Colaborador</a></li>
+
     </ul>
 
 <!--@endsection-->

@@ -30,9 +30,10 @@
     
 </head>
 <body>
-   {{-- @include('commons.navbar');--}}
     <div class="container-fluid">
-    @yield('content-area')
+        <div class="my-3">@include('commons.navbar');</div>
+           
+        @yield('content-area')
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" 

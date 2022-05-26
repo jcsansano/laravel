@@ -1,9 +1,9 @@
 <?php
 
-/*  Mòdul: seuCrear.blade.php
+/*  Mòdul: seuPresentar.blade.php
  *  Joan Carles Sansano Belso 2022 DWES-DAW" 
  *  Exercici: GePOL
- *  Descripció: Mòdul de creació de Seus Avaluadores
+ *  Descripció: Mòdul de consulta Seu Avaluadora
  *  Laravel
  */
 ?>
@@ -12,7 +12,7 @@
     <body>-->
 @extends('plantilles.plantillaPrincipal')
 
-@section ('page-title', 'GePOL')
+{{-- @section ('page-title', 'GePOL')--}}
 
 @section ('content-area')
   
