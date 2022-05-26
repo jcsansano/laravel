@@ -1,7 +1,7 @@
 //variables request
         $estat=(isset($request['estat']))?$request['estat']:'A';
         $sentitOrdenacio=(isset($request['sentitOrdenacio']))?$request['sentitOrdenacio'] : 'ASC';
-        $criteriOrdenacio=(isset($criteriOrdenacio))?$criteriOrdenacio:'nomAcredit';
+        $criteriOrdenacio=(isset($criteriOrdenacio))?$criteriOrdenacio:$campOrdenacio;
     // Paginat
         $registresPagina = (isset($request['registresPagina']))?(int)$request['registresPagina']:5;
         $pageNumber = (isset($request['pageNumber']))?$request['pageNumber']:1;

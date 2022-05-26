@@ -7,10 +7,10 @@ function pujarImatge($files){
         $imgPermeses=[1,2,3,4,5,6,7,8];
         $temporal = $files["imatge"]["tmp_name"];
         $propietats= getimagesize($files['imatge']['tmp_name']);
-        $desti = "pujades/" . $files["imatge"]["name"];
+        $desti ="./fotos/" . $files["imatge"]["name"];
         $missatgeCarrega.=(isset($files['imatge']['name']) 
             && $files['imgArt']['size']==0)?"- No te contingut.<br/>":"";
-        $missatgeCarrega.=($files['imgArt']['size']>($pesImg*1024))?"- Pes superior a ".pesImg."Kb.<br/>":"";
+        $missatgeCarrega.=($files['imgArt']['size']>($pesImg*1024))?"- Pes superior a ".$pesImg."Kb.<br/>":"";
         $missatgeCarrega.=   
                 (in_array($propietats[2], $imgPermeses))?"":"- Tipus de arxiu no permés";
         if($missatgeCarrega==""){ 

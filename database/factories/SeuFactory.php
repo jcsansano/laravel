@@ -1,7 +1,6 @@
 <?php
 
 namespace Database\Factories;
-
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +18,8 @@ class SeuFactory extends Factory
         return ['nomSeu' => $this->faker->unique()->text(30),
                 'correuSeu'=>$this->faker->unique()->email(),
                 'notesSeu'=>$this->faker->optional()->paragraph(4),
-                 'logoSeu'=>$this->faker->optional()->text(30),
-                'baixaSeu'=>$this->faker->optional()->dateTime()];
+                //'logoSeu'=>$this->faker->optional()->text(30),
+                //'baixaSeu'=>$this->faker->optional()->dateTime()
+            ];
     }
 }
