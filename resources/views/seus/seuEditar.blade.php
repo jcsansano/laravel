@@ -17,7 +17,7 @@
 @if($errors->any())
     <div class="alert alert-danger">
         <ul>
-            @foreach($errors->all() as $error)
+            @foreach($errors->all() as $error) {{--Espai per a errades de validacio --}}
             <li><strong>{{$error}}</strong></li>
             @endforeach 
         </ul>
@@ -44,14 +44,14 @@
             </div>
         </div>
         <div class="class col-sm-8">
-            <form action="{{route($taula.'Update',[$reg=>$registre])}}" method="post">
-                @method('PUT')
+            <form action="{{route($taula.'Update')}}" method="post">
+               {{-- @method('put')--}}
                 @csrf
                 <div class="row my-3"> 
                     <div class="col-sm-8">
                         <strong class="text-danger">Id:</strong>&nbsp;{{$registre['id']}}
+                        <input type="hidden" name="id" value="{{$registre['id']}}">
                     </div>
-                   {{-- <div class="col-sm-6"> {{.$registre->id}} </div>--}}
                 </div>
                 @for ($n=0; $n < count($campsLlista); $n++)
                     
@@ -74,32 +74,14 @@
                             @default
                             {{'ETIQUETA HTML NO DEFINIDA'}}
                         @endswitch
-
-
-
                     </div>
                 </div>
-                    
                 @endfor
                 {{-- <div classs="row my-3"> 
                   <div class="input-field col-sm-8">
                         <label for="form-nomSeu">Seu:</label>
                         <input class="form-control" type="text" name="Seu" id="form-nomSeu"
                             value="{{old('Seu')?:$registre->nomSeu}}">
-                    </div>
-                </div>
-                <div class="row my-3"> 
-                    <div class="input-field col-sm-6">
-                        <label for="form-correuSeu">Correu:</label>
-                        <input class="form-control" type="text" name="Correu" id="form-correuSeu"
-                            value="{{ old('Correu')?:$registre->correuSeu }}">
-                    </div>
-                </div>
-                <div class="row my-3"> 
-                    <div class="input-field col-sm-8">
-                        <label for="form-notesSeu">Notes:</label>
-                        <textarea class="form-control" name="Notes" 
-                                id="form-notesSeu">{{old('Notes')?:$registre->notesSeu}}</textarea>
                     </div>
                 </div>--}}
                 <div class="row my-3">

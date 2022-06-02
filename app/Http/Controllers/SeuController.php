@@ -15,35 +15,15 @@ class SeuController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
-        // dd(); 
-        //$vista='seu';
         $taula='seus';
         $campOrdenacio='nomSeu';
-        $campsLlista=['Seu','Correu'];
-        //variables request
-        // include('commonsList.php');
-        $estat=(isset($request['estat']))?$request['estat']:'A';
-        $criteriOrdenacio=(isset($criteriOrdenacio))?$criteriOrdenacio:$campOrdenacio;
-        $sentitOrdenacio=(isset($request['sentitOrdenacio']))?$request['sentitOrdenacio'] : 'ASC';
+        $campsLlista=[['Seu',   'input',    'text', 'nomSeu'],
+                      ['Correu','input',    'text', 'correuSeu'],
+                     // ['Notes', 'textarea', '',     'notesSeu']
+                    ];
 
-        // Paginat
-        $registresPagina = (isset($request['registresPagina']))?(int)$request['registresPagina']:5;
-        $pageNumber = (isset($request['pageNumber']))?$request['pageNumber']:1;
-        $taulaQuery=DB::table($taula);
-        if ($estat == 'A') {  $taulaQuery->whereNull('deleted_at');               // Actius
-        } elseif ($estat == 'I') { $taulaQuery->whereNotNull('deleted_at');  }    // Inactius
+         include('commons/indexcont.php');
 
-        $taulaQuery->orderBy($criteriOrdenacio,$sentitOrdenacio);
-        $registresTrobats = count($taulaQuery->get());
-        if ($registresPagina == 0) {
-            $registresATrobar = $registresTrobats;
-            $pageNumber = 1;
-        } else {
-            $registresATrobar = $registresPagina;
-            $maxPage = ceil($registresTrobats/$registresATrobar);
-            if ($pageNumber > $maxPage) {   $pageNumber = $maxPage;     }
-        }
-        $taulaList = $taulaQuery->paginate($registresATrobar, ['*'], 'pageNumber', $pageNumber);
         return view('seus.seusLlistar')->with(['taulaList'=>$taulaList,
                                         'taula'=>$taula,
                                         'estat'=>$estat,
@@ -65,9 +45,16 @@ class SeuController extends Controller{
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-       return view('seus.seuAfegir');
+    public function create(){
+        $taula='seus';
+       // $criteriOrdenacio='nomSeu';
+        $campsLlista=[['Seu',   'input',    'text', 'nomSeu'],
+                      ['Correu','input',    'text', 'correuSeu'],
+                      ['Notes', 'textarea', '',     'notesSeu']];
+       return view('seus.seuAfegir')->with(['taula'=>$taula,
+                                          // 'criteriOrdenacio'=>$criteriOrdenacio, 
+                                           'campsLlista'=>$campsLlista]); 
+    
     }
 
     /**
@@ -78,19 +65,19 @@ class SeuController extends Controller{
      */
     public function store(Request $request)    {
         $taula='seus';
-        $condicions=['form_nomSeu'=>'required|max:30|unique:seus,nomSeu',
+        $condicions=['Seu'=>'required|max:30|unique:seus,nomSeu',
         //'email:filter'|
-                     'form_correuSeu'=>'max:35|unique:seus,correuSeu',
-                     'form_logoSeu'=>'max:30'
+                     'Correu'=>'max:35|unique:seus,correuSeu',
+                     'Logo'=>'max:30'
                     ];
         $request->validate($condicions);
-        Seu::create(['nomSeu'=>$request['form_nomSeu'],
-                     'correuSeu'=>$request['form_correuSeu'],
-                     'notesSeu'=>$request['form_notesSeu'],
-                     'logoSeu'=>$request['form_logoSeu'],
+        Seu::create(['nomSeu'=>$request['Seu'],
+                     'correuSeu'=>$request['Correu'],
+                     'notesSeu'=>$request['Notes'],
+                     'logoSeu'=>$request['logo'],
                      'baixaSeu'=>null
         ]);
-        return view('seus.seuAfegir')->with(['taula'=>$taula,]);
+        return redirect()->route('seusCreate'); //view('seus.seuAfegir')->with(['taula'=>$taula,]);
     }
 
     /**
@@ -99,8 +86,7 @@ class SeuController extends Controller{
      * @param  \App\Models\Seu  $seu
      * @return \Illuminate\Http\Response
      */
-    public function show(Seu $seu)
-    {
+    public function show(Seu $seu) {
         //dd($seu);
         return view('seus.seuPresentar')->with(['seu'=>$seu]);
     }
@@ -111,7 +97,7 @@ class SeuController extends Controller{
      * @param  \App\Models\Seu  $seu
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, Seu $seu){   
+    public function edit(Request $request){   
         // variables especifique de la taula
         $taula='seus';
                     // nom,     etiqHTML,   type,   camp
@@ -120,8 +106,9 @@ class SeuController extends Controller{
                       ['Notes', 'textarea', '',     'notesSeu']];
         $reg='seu';
         //cerca del registre
+       dump($request);
         $registre=Seu::withTrashed()->findOrFail($request['edit_id'])->toArray();
-        //dump($registre);
+      
         return view('seus.seuEditar')->with(['registre'=>$registre,
                                              'taula'=>$taula,
                                              'reg'=>$reg,
@@ -136,19 +123,31 @@ class SeuController extends Controller{
      * @param  \App\Models\Seu  $seu
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Seu $seu){
-        $condicions=['Seu'=>'required|max:30|unique:seus,nomSeu,'.$seu->id.',id',
-                                         'Correu'=>'max:35|unique:seus,correuSeu',
-                     'Logotip'=>'max:30'
-                    ];
+    public function update(Request $request){
+        ///dd($request);
+        $condicions=['nomSeu'=>['required','max:30',Rule::unique('seus')
+                        ->where(function ($query) use ($request) {
+                            return $query->where('nomSeu',$request['Seu']);
+                            })->ignore($request->id, 'id')],
+                     'correuSeu'=>['max:35', Rule::unique('seus')
+                        ->where(function ($query) use ($request) {
+                            return $query->where('correuSeu', $request['Seu']);
+                            })->ignore($request->id, 'id')],
+                     'logoSeu'=>'max:30'];
+  
+        
+
+// REVISAR
+
         $request->validate($condicions);
-        $canvi=Seu::find($seu->id);
+
+        $canvi=Seu::find($request->id);
         $canvi->nomSeu =      $request->Seu;
-       
         $canvi->correuSeu =   $request->Correu;
         $canvi->notesSeu =    $request->Notes;
         $canvi->logoSeu =     $request->Logotip;
-        return $canvi->save();
+        $canvi->save();
+        return view('inicio'); 
         
     }
 

@@ -30,7 +30,7 @@
 <h2>{{ $titol }}</h2> 
 <div class="container">
   <div class="row">
-    <div class="col-sm-3">
+    <div class="col-sm-2">
        {{-- <img src="../fotos/nologoseu.jpg" class="rounded float-center" alt="Logo identificador de la seu.">--}}
     </div>
     <div class="class col-sm-8">
@@ -53,13 +53,15 @@
         <div><br></div>
 @if (count($taulaList) > 0)
         <div class="row">
+            
             <div class="col-sm-12 ">
                 <table class="table table-striped table-bordered table-hover ">
                     <thead class="thead-dark">
                         <tr>       
+                        @for ($n=0; $n < count($campsLlista); $n++)
                             <th>
-                                <span class="zona-rotulo-cabecera">{{$campsLlista[0]}}</span>
-                            @if ($criteriOrdenacio == $criteriOrdenacio)
+                                <span class="zona-rotulo-cabecera">{{$campsLlista[$n][0]}}</span>
+                                @if ($criteriOrdenacio == $campsLlista[$n][3])
                                 <span class="zona-orden-cabecera">
                                     <a href="#" class="ordenacio" value="{{$criteriOrdenacio}}">
                                 @if ($sentitOrdenacio == "ASC")
@@ -70,10 +72,6 @@
                                     </a>
                                 </span>
                             @endif
-                            </th>
-                        @for ($n=1; $n < count($campsLlista); $n++)
-                            <th>
-                                <span class="zona-rotulo-cabecera">{{$campsLlista[$n]}}</span>
                             </th>
                         @endfor
                             <th width='50'></th>

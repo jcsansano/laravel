@@ -6,7 +6,7 @@
  *  Descripció: Mòdul de creació i edició de Seus Avaluadores
  *  Laravel
  */
-
+//print_r($campsLlista);
 ?>
 
 @extends('plantilles.plantillaPrincipal')
@@ -14,7 +14,7 @@
 @section ('content-area')
 {{-- @include('commons.funcions.php')    --}}
 <h2 class="text-center">Nova Seu Avaluadora</h2> 
-@if($errors->any())
+@if($errors->any()) {{--Espai per a errades de validacio --}}
     <div class="alert alert-danger">
         <ul>
             @foreach($errors->all() as $error)
@@ -43,25 +43,27 @@
                 <div class="col-sm-3"></div>
             </div>
         </div>
+        
         <div class="class col-sm-8">
-            <form action="{{route('seusStore')}}" method="post">
+            <form action="{{route($taula.'Store')}}" method="post">
                 @csrf
-        {{--    <div class="row"> 
-                    <div class="col-sm">
-                        <strong class="text-danger">Id:</strong>
-                    </div>
-                    <div class="col-sm-9">
-                        {{$seu->id}}
-                    </div>
-                </div>--}}
+                @for ($n=0; $n < count($campsLlista); $n++)
                 <div class="row my-3"> 
                     <div class="input-field col-sm-8">
-                        <label for="form-nomSeu">Seu:</label>
+                            <label for="{{$campsLlista[$n][0]}}">{{$campsLlista[$n][0]}}:</label>
+                        <input class="form-control" type="{{$campsLlista[$n][2]}}" name="{{$campsLlista[$n][0]}}" 
+                            id="{{$campsLlista[$n][0]}}" 
+                            value="{{old($campsLlista[$n][0])}}">
+                        </input>
+                            
+                        {{--<label for="form-nomSeu">Seu:</label>
                         <input class="form-control" type="text" name="form_nomSeu" id="form-nomSeu"
-                            value="{{old('form_nomSeu')}}">
+                            value="{{old('form_nomSeu')}}">--}}
+                            
                     </div>
                 </div>
-                <div class="row my-3"> 
+@endfor
+{{--                <div class="row my-3"> 
                     <div class="input-field col-sm-8">
                         <label for="form-correuSeu">Correu:</label>
                         <input class="form-control" type="text" name="form_correuSeu" id="form-correuSeu"
@@ -74,7 +76,7 @@
                         <textarea class="form-control" name="form_notesSeu" 
                                 id="form-notesSeu">{{old('form_notesSeu')}}</textarea>
                     </div>
-                </div>
+                </div>--}}
                 <div class="row my-3">
                     <div class="input-field col-sm-3">
                         <input class="btn btn-primary btn-small" type="submit" 
