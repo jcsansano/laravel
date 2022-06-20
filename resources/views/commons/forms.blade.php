@@ -23,10 +23,10 @@
     <input type="hidden" id="show_id" name="show_id" value="">
 </form>--}}
 
-<form id="editForm" action="{{ route($taula.'Edit') }}" method="post">
+{{-- <form id="editForm" action="{{ route($taula.'Edit',$id) }}" method="get">
     @csrf
     <input type="hidden" id="edit_id" name="edit_id" value="">
-</form>
+</form>--}}
 
 <form id="chstForm" action="{{ route($taula.'ChangeState') }}" method="post">
     @csrf

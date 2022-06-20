@@ -61,11 +61,11 @@ $('.enllasEstat').on('click', function(e) {
     $('#chstForm').submit();
 });
 
-$('.registreEdit').on('click',function(e){
+/*$('.registreEdit').on('click',function(e){
     e.preventDefault();
     $('#edit_id').prop('value',$(this).prop('id'));
     $('#editForm').submit();
-});
+});*/
 
 // Boto Afegir registre  
 // ES COMENTA PER QUE AÇÒ ACTIVA EL BOTO D'AFEGIR REGISTRES EN FORMULARIS DE TAULES AUXILIARS

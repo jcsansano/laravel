@@ -21,13 +21,13 @@ Route::get('/', 'App\Http\Controllers\MainController@home')->name('inicio');
 
 /** Rutes de Seus */
 Route::group(['middleware'=>'web'], function(){
-    Route::post('actualitzaSeu', 'App\Http\Controllers\SeuController@update')
+    Route::match(['get','put'], 'actualitzaSeu', 'App\Http\Controllers\SeuController@update')
         ->name('seusUpdate');
     Route::match(['get','post'],'llistaSeu', 'App\Http\Controllers\SeuController@index')
         ->name('seusList');
     Route::get('novaSeu',   'App\Http\Controllers\SeuController@create') 
         ->name('seusCreate');
-    Route::match(['get','post'],'editaSeu',  'App\Http\Controllers\SeuController@edit')
+    Route::get('editaSeu/{id}',  'App\Http\Controllers\SeuController@edit')
         ->name('seusEdit');
     Route::post('emmagatzemaSeus', 'App\Http\Controllers\SeuController@store')
         ->name('seusStore');    

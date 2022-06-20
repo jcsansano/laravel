@@ -62,21 +62,7 @@
                             
                     </div>
                 </div>
-@endfor
-{{--                <div class="row my-3"> 
-                    <div class="input-field col-sm-8">
-                        <label for="form-correuSeu">Correu:</label>
-                        <input class="form-control" type="text" name="form_correuSeu" id="form-correuSeu"
-                            value="{{old('form_correuSeu') }}">
-                    </div>
-                </div>
-                <div class="row my-3"> 
-                    <div class="input-field col-sm-8">
-                        <label for="form-notesSeu">Notes:</label>
-                        <textarea class="form-control" name="form_notesSeu" 
-                                id="form-notesSeu">{{old('form_notesSeu')}}</textarea>
-                    </div>
-                </div>--}}
+                @endfor
                 <div class="row my-3">
                     <div class="input-field col-sm-3">
                         <input class="btn btn-primary btn-small" type="submit" 

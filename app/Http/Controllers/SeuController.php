@@ -6,7 +6,12 @@ use App\Models\Seu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use League\Flysystem\CorruptedPathDetected;
+use phpDocumentor\Reflection\PseudoTypes\LowercaseString;
+use Throwable;
+
 //use \Illuminate\Http\Response;
+include('../resources/views/commons/funcions.php');
 
 class SeuController extends Controller{
     /**
@@ -87,7 +92,7 @@ class SeuController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function show(Seu $seu) {
-        //dd($seu);
+    
         return view('seus.seuPresentar')->with(['seu'=>$seu]);
     }
 
@@ -97,7 +102,7 @@ class SeuController extends Controller{
      * @param  \App\Models\Seu  $seu
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request){   
+    public function edit(int $id){   
         // variables especifique de la taula
         $taula='seus';
                     // nom,     etiqHTML,   type,   camp
@@ -106,9 +111,10 @@ class SeuController extends Controller{
                       ['Notes', 'textarea', '',     'notesSeu']];
         $reg='seu';
         //cerca del registre
-       dump($request);
-        $registre=Seu::withTrashed()->findOrFail($request['edit_id'])->toArray();
-      
+       $registre=null;
+       //$valor=(isset($request['edit_id']))?$request['edit_id']:$request['id'];
+
+       $registre=Seu::withTrashed()->findOrFail($id)->toArray();
         return view('seus.seuEditar')->with(['registre'=>$registre,
                                              'taula'=>$taula,
                                              'reg'=>$reg,
@@ -124,22 +130,21 @@ class SeuController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request){
-        ///dd($request);
-        $condicions=['nomSeu'=>['required','max:30',Rule::unique('seus')
-                        ->where(function ($query) use ($request) {
-                            return $query->where('nomSeu',$request['Seu']);
-                            })->ignore($request->id, 'id')],
-                     'correuSeu'=>['max:35', Rule::unique('seus')
-                        ->where(function ($query) use ($request) {
-                            return $query->where('correuSeu', $request['Seu']);
-                            })->ignore($request->id, 'id')],
-                     'logoSeu'=>'max:30'];
-  
-        
+        $campsLlista=[['Seu',   'input',    'text', 'nomSeu'],
+                      ['Correu','input',    'text', 'correuSeu'],
+                      ['Notes', 'textarea', '',     'notesSeu']];
+        $condicions=[
+            'Seu'=>'required|max:30|unique:seus,nomSeu,'.$request['id'],
+            'Correu'=>'max:35|unique:seus,correuSeu,'.$request['id'],
+            'Logo'=>'max:30'
+        ];
+        //validara imagen php
+        if(pujarImatge()!==""){//$request['logoSeu']
+        //si imagen correcta ejecurar validate
+                $request->validate($condicions);
+        }
 
-// REVISAR
-
-        $request->validate($condicions);
+        //subir imagen php
 
         $canvi=Seu::find($request->id);
         $canvi->nomSeu =      $request->Seu;
@@ -147,12 +152,12 @@ class SeuController extends Controller{
         $canvi->notesSeu =    $request->Notes;
         $canvi->logoSeu =     $request->Logotip;
         $canvi->save();
-        return view('inicio'); 
-        
+        //sino imagen correcta
+        return back()->with('status','Registre actualitzat correctament.');
     }
 
     public function changeState(Request $request) {
-        //dd($request);
+       
         if($request['chst_id']!= null){
             $seu = Seu::withTrashed()->find($request['chst_id']);
             if($seu != null){

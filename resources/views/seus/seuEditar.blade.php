@@ -14,18 +14,40 @@
 @section ('content-area')
   
 <h2 class="text-center">Edició Seu Avaluadora: {{$registre['id'].' - '.$registre['nomSeu']}}</h2>
-@if($errors->any())
+{{-- @if($errors->any())
     <div class="alert alert-danger">
         <ul>
-            @foreach($errors->all() as $error) {{--Espai per a errades de validacio --}}
+            @foreach($errors->all() as $error) Espai per a errades de validacio 
             <li><strong>{{$error}}</strong></li>
             @endforeach 
         </ul>
     </div>
 @endif
+--}}
 <div class="container justify-content-center">
+<form action="{{route($taula.'Update')}}" method="post">
+    @method('put')
+    @csrf
     <div class="row">
         <div class="class col-sm-4">
+            <div class="row">
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+            @foreach($errors->all() as $error) {{--Espai per a errades de validacio --}}
+                        <li><strong>{{$error}}</strong></li>
+            @endforeach 
+                    </ul>
+                </div>
+            @endif
+            @if(session()->has('status'))
+            <div  name="error" id="errorId" class="alert alert-success row my-3">
+                    
+                    <p>{{session('status')}}</p>
+                    
+                </div>
+                @endif
+            </div>
             <div class="row content-justify-center">
                 <div class="col-sm-3"></div>
                 <div class="row">
@@ -35,18 +57,26 @@
                     </div>
                 </div>
                 <div class="row content-justify-center">
-                    <input class="form-control-sm my-3" type="file" id="pujaFoto" 
+                    
+                    <input class="form-control-sm my-3" type="file" id="pujaFoto" name="imatge"
                             accept="image/jpeg, image/png, image/gif, 
-                                    image/tiff, image/webp, image/svg+xml" value="" >
-                    <div id="novaImg" class="content-justify-center" ></div>
+                                    image/tiff, image/webp, image/svg+xml"  >
                 </div>
-                <div class="col-sm-3"></div>
+                <div class="row" id="verificacio">
+                {{--    <div class="row" id="pujar" name="pujarImg">
+                    <button name="pujArxiu" type="submit" class="btn btn-info"
+                        onclick="this.form.action='{{route($taula."Pujar")}}'">Carrega imatge</button>
+                    </div>--}}
+
+                </div>
+                <div id="novaImg" class="row content-justify-center" ></div>
+                <div class="row"></div>
             </div>
         </div>
         <div class="class col-sm-8">
-            <form action="{{route($taula.'Update')}}" method="post">
-               {{-- @method('put')--}}
-                @csrf
+           {{-- <form action="{{route($taula.'Update')}}" method="post">
+               @method('put')
+                @csrf --}}
                 <div class="row my-3"> 
                     <div class="col-sm-8">
                         <strong class="text-danger">Id:</strong>&nbsp;{{$registre['id']}}
@@ -84,6 +114,11 @@
                             value="{{old('Seu')?:$registre->nomSeu}}">
                     </div>
                 </div>--}}
+                {{--<div  name="error" id="errorId" class="alert alert-success row my-3">
+                    @if(session()->has('status'))
+                    <p>{{session('status')}}</p>
+                    @endif
+                </div>--}}
                 <div class="row my-3">
                     <div class="input-field col-sm-3">
                         <input class="btn btn-primary btn-small" type="submit" value="Registrar">
@@ -93,13 +128,14 @@
                     </div>
                     <div class="input-field col-sm-3">
                         <input class="btn btn-primary btn-small" type=button 
-                            href="{{route('seusList')}}" value="Cancel·lar">
+                            href="{{route($taula.'List')}}" value="Cancel·lar">
                     </div>
                 </div>
                 <input id='logo' type="hidden" name='logoSeu' value="{{old('logoSeu')}}">
-            </form>
+            {{--</form>--}}
         </div>
-    </div>        
+    </div>
+                </form>        
 </div>
 <script languaje="javascript" src="{{ asset('js/common/afegir.js') }}"></script>  
 @endsection      
