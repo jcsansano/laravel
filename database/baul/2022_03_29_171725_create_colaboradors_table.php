@@ -17,11 +17,11 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             //$table->integer('id_seu')->unsigned();
-            $table->string('dniColab',9)->unique();
-            $table->enum('nomColab', 15);
-            $table->enum('cognomsColab',35);
+            $table->string('nifColab',9)->unique(); 
+            $table->string('nomColab', 30);
+            $table->string('cognomsColab',50);
             $table->string('correuColab',35)->unique();
-            $table->enum('telefonColab',9)->unique();
+            $table->string('telefonColab',9)->unique();
             $table->string('fotoColab',30)->nullable();
             $table->text('notesColav')->nullable();
             //$table->foreing('id_seu')->references('id')->on('seus');

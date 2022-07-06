@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Seu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use League\Flysystem\CorruptedPathDetected;
 use phpDocumentor\Reflection\PseudoTypes\LowercaseString;
 use Throwable;
 
 //use \Illuminate\Http\Response;
-include('../resources/views/commons/funcions.php');
+include('../public/php/redimensioImatges.php');
+define('TITOL','Seu Avaluadora');
+define('TITOLS','Seus Avaluadores');
 
 class SeuController extends Controller{
     /**
@@ -52,13 +56,22 @@ class SeuController extends Controller{
      */
     public function create(){
         $taula='seus';
+        $titol='Nova '.TITOL;
        // $criteriOrdenacio='nomSeu';
-        $campsLlista=[['Seu',   'input',    'text', 'nomSeu'],
-                      ['Correu','input',    'text', 'correuSeu'],
-                      ['Notes', 'textarea', '',     'notesSeu']];
+       //               labelCamp  ctrlHTML   type    nomCamp    
+        $campsLlista=[
+            'imatge'=>'logoSeu',
+            'camps' =>[// nom,     etiqHTML,   type,   camp
+                        ['Seu',   'input',    'text', 'nomSeu'],
+                        ['Correu','input',    'text', 'correuSeu'],
+                        ['Notes', 'textarea', '',     'notesSeu']
+                      ]
+            ];
        return view('seus.seuAfegir')->with(['taula'=>$taula,
                                           // 'criteriOrdenacio'=>$criteriOrdenacio, 
-                                           'campsLlista'=>$campsLlista]); 
+                                           'campsLlista'=>$campsLlista,
+                                           'titol'=>$titol
+                                        ]); 
     
     }
 
@@ -69,20 +82,44 @@ class SeuController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)    {
-        $taula='seus';
-        $condicions=['Seu'=>'required|max:30|unique:seus,nomSeu',
-        //'email:filter'|
-                     'Correu'=>'max:35|unique:seus,correuSeu',
-                     'Logo'=>'max:30'
+        //$taula='seus';
+        $condicions=[
+                    'Seu'=>'required|max:30|unique:seus,nomSeu,'.$request['id'],
+                    'Correu'=>'max:35|unique:seus,correuSeu,'.$request['id']
                     ];
-        $request->validate($condicions);
+
+        //validar imatge php
+        if($request['contingut']!==""){
+            $extensio=explode('.',$_FILES['imatge']['name']);
+            $nouNom=$request['Correu'].'.'.end($extensio); 
+            //que passa si repeteix el correu????
+            //que passa si es modifica el correu?????
+
+            //$nouNom='SEU'.str_pad($request['id'],5 - strlen($request['id']),'0',STR_PAD_LEFT).'.'.end($extensio);
+            $resposta=pujarImatge("./fotos/".$nouNom);
+        //si imatge correcta executar validate
+            $request->validate($condicions);
+            $request['logo']=$nouNom; //$request->LogoSeu;
+         }   
+
+        
         Seu::create(['nomSeu'=>$request['Seu'],
                      'correuSeu'=>$request['Correu'],
                      'notesSeu'=>$request['Notes'],
                      'logoSeu'=>$request['logo'],
                      'baixaSeu'=>null
         ]);
-        return redirect()->route('seusCreate'); //view('seus.seuAfegir')->with(['taula'=>$taula,]);
+        
+       /* $canvi=Seu::find($request['logo']);
+        
+        $nouNom=str_ireplace('0000',
+            str_pad($canvi['logo'],5 - strlen($canvi['id']),'0',STR_PAD_LEFT),$canvi['logoSeu']);
+        rename('../fotos/'.$canvi['logoSeu'],'../fotos/'.$nouNom);  
+            $canvi['logoSeu']=$nouNom;
+        $canvi->save();
+         */ 
+        //return redirect()->route('seusCreate'); //view('seus.seuAfegir')->with(['taula'=>$taula,]);
+        return back()->with('status','Registre actualitzat correctament.');
     }
 
     /**
@@ -105,20 +142,25 @@ class SeuController extends Controller{
     public function edit(int $id){   
         // variables especifique de la taula
         $taula='seus';
-                    // nom,     etiqHTML,   type,   camp
-        $campsLlista=[['Seu',   'input',    'text', 'nomSeu'],
-                      ['Correu','input',    'text', 'correuSeu'],
-                      ['Notes', 'textarea', '',     'notesSeu']];
+        $titol='Edició '.TITOL;
+        $campsLlista=[
+            'imatge'=>'logoSeu',
+            'camps' =>[// nom,     etiqHTML,   type,   camp
+                        ['Seu',   'input',    'text', 'nomSeu'],
+                        ['Correu','input',    'text', 'correuSeu'],
+                        ['Notes', 'textarea', '',     'notesSeu']
+                      ]
+                    ];
         $reg='seu';
         //cerca del registre
-       $registre=null;
-       //$valor=(isset($request['edit_id']))?$request['edit_id']:$request['id'];
-
-       $registre=Seu::withTrashed()->findOrFail($id)->toArray();
+        $registre=null;
+        $registre=Seu::withTrashed()->findOrFail($id)->toArray();
+        $registre['logoSeu']=($registre['logoSeu'])??'nologoseu.jpg';
         return view('seus.seuEditar')->with(['registre'=>$registre,
                                              'taula'=>$taula,
                                              'reg'=>$reg,
-                                             'campsLlista'=>$campsLlista
+                                             'campsLlista'=>$campsLlista,
+                                             'titol'=>$titol
                                             ]);
     }
 
@@ -130,18 +172,23 @@ class SeuController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request){
-        $campsLlista=[['Seu',   'input',    'text', 'nomSeu'],
-                      ['Correu','input',    'text', 'correuSeu'],
-                      ['Notes', 'textarea', '',     'notesSeu']];
+
         $condicions=[
-            'Seu'=>'required|max:30|unique:seus,nomSeu,'.$request['id'],
-            'Correu'=>'max:35|unique:seus,correuSeu,'.$request['id'],
-            'Logo'=>'max:30'
-        ];
+                    'Seu'=>'required|max:30|unique:seus,nomSeu,'.$request['id'],
+                    'Correu'=>'max:35|unique:seus,correuSeu,'.$request['id']
+                    ];
         //validara imagen php
-        if(pujarImatge()!==""){//$request['logoSeu']
-        //si imagen correcta ejecurar validate
-                $request->validate($condicions);
+        if($request['contingut']!==""){
+            $extensio=explode('.',$_FILES['imatge']['name']);
+            $nouNom=$request['Correu'].'.'.end($extensio); 
+            //que passa si repeteix el correu????
+            //que passa si es modifica el correu?????
+
+            //$nouNom='SEU'.str_pad($request['id'],5 - strlen($request['id']),'0',STR_PAD_LEFT).'.'.end($extensio);
+            $resposta=pujarImatge("./fotos/".$nouNom);
+
+        //si imatge correcta executar validate
+            $request->validate($condicions);
         }
 
         //subir imagen php
@@ -150,7 +197,7 @@ class SeuController extends Controller{
         $canvi->nomSeu =      $request->Seu;
         $canvi->correuSeu =   $request->Correu;
         $canvi->notesSeu =    $request->Notes;
-        $canvi->logoSeu =     $request->Logotip;
+        $canvi->logoSeu =     $nouNom; //$request->LogoSeu;
         $canvi->save();
         //sino imagen correcta
         return back()->with('status','Registre actualitzat correctament.');
@@ -179,5 +226,8 @@ class SeuController extends Controller{
      */
     public function destroy(Seu $seu)    {
         
+    }
+    public function seuCancelar(){
+        return redirect('llistaSeu');
     }
 }

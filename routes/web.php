@@ -36,6 +36,9 @@ Route::group(['middleware'=>'web'], function(){
         ->name('seusDestroy');
     Route::post('canviSeu', 'App\Http\Controllers\SeuController@changeState')
         ->name('seusChangeState');
+    Route::get('seusCancelar', 'App\Http\Controllers\SeuController@seuCancelar')
+        ->name('seusCancelar');
+
 });
 
 /** Rutes d'OrganAcreditador */
