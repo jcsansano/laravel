@@ -42,10 +42,8 @@
 
 <!- ESPAI PER A COLOCAR LA IMATGE -->                
                         <div id="preview" class="col-sm-6">
-                            <?php $nomImatge=(old('Arretrataura'))?:'../fotos/nologoseu.jpg' ?>
-
-                            <img src="{{'../fotos/ '.$nomImatge }}" class="img-fluid rounded float-center" 
-                                alt="Logo identificador de la seu." name='Arretrataura' />
+                            <img src="{{'./fotos/'.$tmpImatge }}" class="img-fluid rounded float-center" 
+                                alt="Logo identificador de la seu."  />
                         </div>
                         <div class="row justify-content-center"> <!- Captura de la nova Imatge -->
                             <input class="form-control-sm my-3" type="file" id="pujaFoto" name="imatge" 

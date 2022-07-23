@@ -15,4 +15,9 @@ class Seu extends Model
     protected $fillable=['nomSeu','correuSeu','notesSeu'];
     
     protected $hidden=[];
+
+    function colaboradors_seu(){
+        return $this->hasMany('App/Models/Colaborador_seu','seuId');
+
+    }
 }

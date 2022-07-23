@@ -1,4 +1,7 @@
 <?php 
+function construirNomImatge($taula,$id,$ext){
+	return $taula.str_pad($id,4,'0',STR_PAD_LEFT).'.'.$ext;
+}
 function pujarImatge($desti){
 //https://datoweb.com/post/2921/como-redimensionar-o-reducir-peso-de-imagenes-con-php
 //per al certes funcions cal activar la directiva de PHP ';extension=gd'
@@ -80,4 +83,5 @@ function pujarImatge($desti){
 	} else {$retorna=1;}  // no s'ha trobat la imatge pujada
 	return $retorna;
 }
+
 ?>

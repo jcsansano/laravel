@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-use App\Models\Colaborador;
+//use App\Models\Colaborador;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,10 +14,20 @@ class Colaborador extends Model
     protected $fillable=['dniColab','nomColab','cognomsColab','correuColab',
                          'telefonColab','notesColab'];
     protected $hidden=[];
+    
+    function colaboradors_seu(){
+        return $this->hasMany('App/Models/Colaborador_seu','colabId');
+    }
+    
+    
+    
+    
+    
     public function acreditacions(){
         return $this->belongsToMany(Acreditacio::class,'acred_orgAcred')
                 ->withPivot('acreditacio_id');
     }
+
 //     public function Acred_OrgAcred(){
 //        return $this->belongsToMany(Acred_OrgAcred::class)->withPivot('id');
 //    }

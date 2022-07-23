@@ -12,9 +12,9 @@
  
 <h2 class="text-center">{{$titol.": ".$registre['id'].' - '.$registre['nomSeu']}}</h2>
 <div class="container justify-content-center">
-    <form  id="registre" action="{{route($taula.'Update')}}" method="post" enctype="multipart/form-data">
-        @method('put')
-        @csrf
+    {{-- <form  id="registre" action="{{route($taula.'Update')}}" method="post" enctype="multipart/form-data">
+       @method('put')
+        @csrf --}}
         <div class="row">                                   <!- Quadre principal del formulari -->
 <!- COLUMNA ESQUERRA -->
             <div class="class col-sm-4 justify-content-center"> 
@@ -40,12 +40,15 @@
                     <!--div class="col-sm-3"></div--> <!- Marge esquerre -->
                     <div class="row justify-content-center">
 
-<!- ESPAI PER A COLOCAR LA IMATGE -->                
+<!- ESPAI PER A COLOCAR LA IMATGE -->
+                    <form  id="imatge" action="{{route($taula.'Imatge')}}" method="post" enctype="multipart/form-data">
+                        @csrf                
                         <div id="preview" class="col-sm-6">
-                            <?php $nomImatge=(old('Arretrataura'))?:$registre[$campsLlista['imatge']] ?>
-
-                            <img src="{{'../fotos/'.$nomImatge }}" class="img-fluid rounded float-center" 
-                                alt="Logo identificador de la seu." name='Arretrataura' />
+                            {{ $_COOKIE['tmpNom'] }}
+                            <img src="{{'../fotos/'.$registre['logoSeu']}}" 
+                            class="img-fluid rounded float-center" 
+                                alt="Logo identificador de la seu." />
+                             
                         </div>
                         <div class="row justify-content-center"> <!- Captura de la nova Imatge -->
                             <input class="form-control-sm my-3" type="file" id="pujaFoto" name="imatge" 
@@ -60,6 +63,9 @@
             <!--?php echo "IMG_GIF=".IMG_GIF."| IMG_JPG=".IMG_JPG." | IMG_PNG=".IMG_PNG.
                     " | IMG_WBMP=".IMG_WBMP." | IMG_XPM=".IMG_XPM; ?-->
 <!- COLUMNA DRETA -->
+        <form  id="registre" action="{{route($taula.'Update')}}" method="post" enctype="multipart/form-data">
+        @method('put')
+        @csrf
             <div class="class col-sm-8">
                 <div class="row my-3"> <!- CAMP Id -->
                     <div class="col-sm-8">
@@ -99,6 +105,7 @@
                 </div>                                                  <!- Fi Àrea de camps -->
             @endfor
                 <input id='logo' type="hidden" name='logoSeu' value="{{old('logoSeu')}}">
+                <control id='registreModificat' value="fals"/> 
                 <div class="row my-3">                                  <!- Línia de botons -->
                     <div class="input-field col-sm-3">
                         <input class="btn btn-primary btn-small" type="submit" value="Registra">

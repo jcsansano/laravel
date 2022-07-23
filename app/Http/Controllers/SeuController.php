@@ -57,6 +57,8 @@ class SeuController extends Controller{
     public function create(){
         $taula='seus';
         $titol='Nova '.TITOL;
+        $tmpImatge='tmp'.$taula.'user.jpg';
+        copy('./fotos/nologoseu.jpg','./fotos/'.$tmpImatge);
        // $criteriOrdenacio='nomSeu';
        //               labelCamp  ctrlHTML   type    nomCamp    
         $campsLlista=[
@@ -67,10 +69,12 @@ class SeuController extends Controller{
                         ['Notes', 'textarea', '',     'notesSeu']
                       ]
             ];
+
        return view('seus.seuAfegir')->with(['taula'=>$taula,
                                           // 'criteriOrdenacio'=>$criteriOrdenacio, 
                                            'campsLlista'=>$campsLlista,
-                                           'titol'=>$titol
+                                           'titol'=>$titol,
+                                           'tmpImatge'=>$tmpImatge
                                         ]); 
     
     }
@@ -82,44 +86,56 @@ class SeuController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)    {
-        //$taula='seus';
+        $taula='seus';
         $condicions=[
                     'Seu'=>'required|max:30|unique:seus,nomSeu,'.$request['id'],
                     'Correu'=>'max:35|unique:seus,correuSeu,'.$request['id']
                     ];
 
         //validar imatge php
-        if($request['contingut']!==""){
+        if(isset($_FILES['imatge']['name']) && $_FILES['imatge']['name']!==""){
             $extensio=explode('.',$_FILES['imatge']['name']);
-            $nouNom=$request['Correu'].'.'.end($extensio); 
-            //que passa si repeteix el correu????
-            //que passa si es modifica el correu?????
+            $tmpNom=construirNomImatge('tmp'.$taula,'user',end($extensio));
+            $resposta=pujarImatge("./fotos/".$tmpNom);
+            //$nouNom=construirNomImatge('SEU',$request['id'],end($extensio));
+            setcookie('tmpNom',$tmpNom,time()+3600,'/');
+            //setcookie('nouNom',$nouNom,time()+3600);
+        }
+        switch($resposta){
+            case 0: // pujada exitosa
+                //$request->validate($condicions);
+                $tmpNom=$_COOKIE['tmpNom'];
+                //$nouNom=$_COOKIE['nouNom'];
+                //rename('./fotos/'.$tmpNom,'./fotos/'.$nouNom);
+                $request->validate($condicions);
+                
+                //recuperar registre, guardar nouNom en logoSeu
+                //$registre=Seu::withTrashed()->findOrFail($request['correuSeu'])->toArray();
+                //$extensio=explode('.',$tmpNom);
+                //$nouNom=construirNomImatge('tmp'.$taula,'SEU',$registre['id'],end($extensio));
+                Seu::create(['nomSeu'=>$request['Seu'],
+                    'correuSeu'=>$request['Correu'],
+                    'notesSeu'=>$request['Notes'],
+                    'logoSeu'=>$request['logo'],
+                    'baixaSeu'=>null
+                ]);   
+                $canvi=Seu::where('nomSeu', $request['Seu'])->first()->toArray();
+                $extensio=explode('.',$tmpNom);
+                $nouNom=construirNomImatge('tmp'.$taula,'SEU',$canvi['id'],end($extensio));
+                
+                $canvi->logoSeu =     $nouNom; //$request->LogoSeu;
+                $canvi->save();
+                return back()->with('status','Registre actualitzat correctament.');
+                break;
+            case 1: // no s'ha trobat la imatge pujada
+            case 2: // tipus de extensio no soportada
+            case 3: // tipus mime no sortat
+            default: // resultat inesperat
+        }
 
-            //$nouNom='SEU'.str_pad($request['id'],5 - strlen($request['id']),'0',STR_PAD_LEFT).'.'.end($extensio);
-            $resposta=pujarImatge("./fotos/".$nouNom);
-        //si imatge correcta executar validate
-            $request->validate($condicions);
-            $request['logo']=$nouNom; //$request->LogoSeu;
-         }   
-
-        
-        Seu::create(['nomSeu'=>$request['Seu'],
-                     'correuSeu'=>$request['Correu'],
-                     'notesSeu'=>$request['Notes'],
-                     'logoSeu'=>$request['logo'],
-                     'baixaSeu'=>null
-        ]);
-        
-       /* $canvi=Seu::find($request['logo']);
-        
-        $nouNom=str_ireplace('0000',
-            str_pad($canvi['logo'],5 - strlen($canvi['id']),'0',STR_PAD_LEFT),$canvi['logoSeu']);
-        rename('../fotos/'.$canvi['logoSeu'],'../fotos/'.$nouNom);  
-            $canvi['logoSeu']=$nouNom;
-        $canvi->save();
-         */ 
-        //return redirect()->route('seusCreate'); //view('seus.seuAfegir')->with(['taula'=>$taula,]);
-        return back()->with('status','Registre actualitzat correctament.');
+            
+            //$request['logo']=$nouNom; //$request->LogoSeu;
+            
     }
 
     /**
@@ -143,6 +159,7 @@ class SeuController extends Controller{
         // variables especifique de la taula
         $taula='seus';
         $titol='Edició '.TITOL;
+
         $campsLlista=[
             'imatge'=>'logoSeu',
             'camps' =>[// nom,     etiqHTML,   type,   camp
@@ -156,11 +173,21 @@ class SeuController extends Controller{
         $registre=null;
         $registre=Seu::withTrashed()->findOrFail($id)->toArray();
         $registre['logoSeu']=($registre['logoSeu'])??'nologoseu.jpg';
+        $extensio=explode('.',$registre['logoSeu']);
+        $tmpImatge=construirNomImatge('tmp'.$taula,'user',end($extensio));
+        if(!file_exists('fotos/'.$tmpImatge)){
+            if(file_exists('fotos/'.$registre['logoSeu'])){
+                copy('./fotos/'.$registre['logoSeu'],'./fotos/'.$tmpImatge);
+                //setcookie('tmpNom',$tmpImatge ,time()+3600,'/');
+            }
+        }
+        
         return view('seus.seuEditar')->with(['registre'=>$registre,
                                              'taula'=>$taula,
                                              'reg'=>$reg,
                                              'campsLlista'=>$campsLlista,
-                                             'titol'=>$titol
+                                             'titol'=>$titol,
+                                             'tmpImatge'=>$tmpImatge                                             
                                             ]);
     }
 
@@ -172,39 +199,68 @@ class SeuController extends Controller{
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request){
-
+        $taula='seus';
         $condicions=[
                     'Seu'=>'required|max:30|unique:seus,nomSeu,'.$request['id'],
                     'Correu'=>'max:35|unique:seus,correuSeu,'.$request['id']
                     ];
         //validara imagen php
-        if($request['contingut']!==""){
+        //$tmpNom=($_COOKIE['tmpNom'])??"";
+        $resposta=-1;
+        if(isset($_FILES['imatge']['name']) && $_FILES['imatge']['name']!==""){
             $extensio=explode('.',$_FILES['imatge']['name']);
-            $nouNom=$request['Correu'].'.'.end($extensio); 
-            //que passa si repeteix el correu????
-            //que passa si es modifica el correu?????
-
-            //$nouNom='SEU'.str_pad($request['id'],5 - strlen($request['id']),'0',STR_PAD_LEFT).'.'.end($extensio);
-            $resposta=pujarImatge("./fotos/".$nouNom);
-
-        //si imatge correcta executar validate
-            $request->validate($condicions);
+            $tmpNom=construirNomImatge('tmp'.$taula,'user',end($extensio));
+            $resposta=pujarImatge("./fotos/".$tmpNom);
+            $nouNom=construirNomImatge('SEU',$request['id'],end($extensio));
+            setcookie('tmpNom',$tmpNom,time()+3600,'/');
+            setcookie('nouNom',$nouNom,time()+3600,'/');
+            
         }
 
-        //subir imagen php
-
-        $canvi=Seu::find($request->id);
-        $canvi->nomSeu =      $request->Seu;
-        $canvi->correuSeu =   $request->Correu;
-        $canvi->notesSeu =    $request->Notes;
-        $canvi->logoSeu =     $nouNom; //$request->LogoSeu;
-        $canvi->save();
-        //sino imagen correcta
-        return back()->with('status','Registre actualitzat correctament.');
+        switch($resposta){
+            case -1: //no ha pujat cap imatge
+                $request->validate($condicions);
+                $canvi=Seu::find($request->id);
+                $canvi->nomSeu =      $request->Seu;
+                $canvi->correuSeu =   $request->Correu;
+                $canvi->notesSeu =    $request->Notes;
+                $canvi->logoSeu =     $nouNom; //$request->LogoSeu;
+                $canvi->save();
+                
+                $estat='Registre actualitzat correctament.';
+                break;
+            case 0: // pujada exitosa
+                $request->validate($condicions);
+                //$tmpNom=$_COOKIE['tmpNom'];
+                //$nouNom=$_COOKIE['nouNom'];
+                rename('./fotos/'.$tmpNom,'./fotos/'.$nouNom);
+                $canvi=Seu::find($request->id);
+                $canvi->nomSeu =      $request->Seu;
+                $canvi->correuSeu =   $request->Correu;
+                $canvi->notesSeu =    $request->Notes;
+                $canvi->logoSeu =     $nouNom; //$request->LogoSeu;
+                $canvi->save();
+                
+                $estat='Registre actualitzat correctament.';
+                break;
+            case 1: // no s'ha trobat la imatge pujada
+                $estat="No s'ha trobat la imatge pujada. Torneu a pujar-la";
+                break;
+            case 2: // tipus de extensio no soportada
+                $estat="Tipus d'arxiu no soportat. Trieu una imatge amb altres formats.";
+                break;
+            case 3: // tipus mime no sortat
+                $estat="Tipus mime no sortat.Trieu una imatge amb altres formats.";
+                break;
+            default: // resultat inesperat
+        }
+        setcookie('tmpNom',$tmpNom,time()-1,'/');
+        setcookie('nouNom',$nouNom,time()-1,'/');
+        return back()->with('status',$estat);
     }
 
     public function changeState(Request $request) {
-       
+       //pendiente dar bajas y atas en todas las tablas relacionadas
         if($request['chst_id']!= null){
             $seu = Seu::withTrashed()->find($request['chst_id']);
             if($seu != null){
@@ -228,6 +284,9 @@ class SeuController extends Controller{
         
     }
     public function seuCancelar(){
+        (isset($_COOKIE['tmpNom']) && file_exists('./fotos/'.$_COOKIE['tmpNom']))?unlink('./fotos/'.$_COOKIE['tmpNom']):"";
+        //if(file_exists('./fotos/'.$tmpNom)) {unlink('./fotos/'.$tmpNom);}
+            
         return redirect('llistaSeu');
     }
 }
