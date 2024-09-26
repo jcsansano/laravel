@@ -93,8 +93,10 @@
                                 </a>
                             </td>
                             <td class="celda-de-icono">
-                                <a href="#" class="registreEdit" id="{{ $registre->id }}">
+                                <a href="{{ route($taula.'Edit', ['id'=>$registre->id]) }}" class="registreEdit" id="{{ $registre->id }}">
                                     <i class="material-icons icono-azul">mode</i>
+                                    
+
                                 </a>
                             </td>
                         </tr>                                                                                           

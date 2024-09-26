@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
         //incorporat
         Paginator::useBootstrap();
         //incorporat
-        Blade::directive("priceformat", function($expressio){
+        /*Blade::directive("priceformat", function($expressio){
             return "<?php echo number_format(floatval($expressio),2, ',', '.').\" €\"; ?>";
         });
         
@@ -37,5 +37,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive("dataSimple", function($expressio){
             return "<?php echo date('d-m-Y',strtotime($expressio)); ?>"; 
         });
+        */
     }
 }

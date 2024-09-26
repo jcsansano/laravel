@@ -1,4 +1,5 @@
         <?php
+
         $estat=(isset($request['estat']))?$request['estat']:'A';
         $criteriOrdenacio=(isset($criteriOrdenacio))?$criteriOrdenacio:$campOrdenacio;
         $sentitOrdenacio=(isset($request['sentitOrdenacio']))?$request['sentitOrdenacio'] : 'ASC';
